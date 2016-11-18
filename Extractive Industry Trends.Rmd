@@ -1,0 +1,42 @@
+---
+title: "Extractive Industry Trends"
+author: "Matthew Ross"
+date: "November 18, 2016"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+---
+
+This document serves as documentation of exploratory data analysis for the extractive industries portion of the Intergovernmental Panel on Biodiversity and Ecosystem Services global report on land-use change. For purposes of this report we bin extractive industries into two categories
+
+- Fuels (including: coal, natural gas, oil, and uranium/plutonium mining)
+
+- Mineral resources(including: rare earth minerals, metals, iron, etc...)
+
+First let's look at global trends in coal
+
+#Fuels
+
+##Coal
+
+```{r libraries,include=F}
+library(tidyverse)
+```
+
+This data comes from the Energy Information Administration [website](https://www.eia.gov/beta/international/data/browser/#/?pa=0000000000000000000000000000000000000000000000000000g&c=ruvvvvvfvtvnvv1urvvvvfvvvvvvfvvvou20evvvvvvvvvnvvuvo&ct=0&tl_id=1-A&vs=INTL.7-1-AFG-TST.A&ord=SA&vo=0&v=H&start=1980&end=2014)
+```{r}
+#Read in data and Clean it up a little. Units are in imperial short tons. Need to convert to metric tons. 
+#Also switching format to be in tidy data format (long). #Remove countries that produce no coal
+coal <- read.csv('data/totalcoal.csv',stringsAsFactors = F) %>%
+  gather(key='Year',value='Coal.kst',-country) %>%
+  mutate(Year=as.numeric(gsub('X','',.$Year))) %>%
+  mutate(Coal.kst=as.numeric(Coal.kst)) %>%
+  filter(!is.na(Coal.kst))
+
+globeplot <- coal %>% filter(country=='GlobalTotal') %>%
+  ggplot(aes(x=Year,y=Coal.kst)) + geom_point() 
+globeplot
+
+```
+
